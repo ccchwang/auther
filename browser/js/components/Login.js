@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
-
+import axios from 'axios';
 /* -----------------    COMPONENT     ------------------ */
 
 class Login extends React.Component {
@@ -60,7 +60,15 @@ class Login extends React.Component {
   onLoginSubmit(event) {
     const { message } = this.props;
     event.preventDefault();
-    console.log(`${message} isn't implemented yet`);
+    const user = {
+      email: event.target.email.value,
+      password: event.target.password.value
+    }
+    console.log(user);
+    axios.post('/login', user)
+    .then(function (results) {
+      console.log("YYYYAAAYYY", results);
+    });
   }
 }
 
