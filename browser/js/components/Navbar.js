@@ -1,7 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link, browserHistory } from 'react-router';
-
+import axios from 'axios';
+import {voidCurrentUser} from '../redux/users'
 /* -----------------    COMPONENT     ------------------ */
 
 class Navbar extends React.Component {
@@ -78,8 +79,12 @@ const mapProps = null;
 
 const mapDispatch = dispatch => ({
   logout: () => {
-    console.log('You signed out. Sorta.');
-    browserHistory.push('/');
+    axios.get('/logout')
+      .then(() => {
+        dispatch(voidCurrentUser())
+         browserHistory.push('/');
+      })
+
   }
 });
 

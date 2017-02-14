@@ -35,7 +35,7 @@ class UserList extends Component {
         {
           this.props.users
             .filter(this.filterUser)
-            .map(user => <UserItem user={user} key={user.id} />)
+            .map(user => <UserItem user={user} key={user.id} isAdmin={this.props.users.currentUser.isAdmin}/>)
         }
         </div>
       </div>

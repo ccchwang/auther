@@ -31,6 +31,12 @@ app.use(require('./logging.middleware'));
 
 app.use(require('./body-parsing.middleware'));
 
+app.get('/logout', function (req, res, next) {
+  req.session.destroy();
+  res.redirect('/')
+});
+
+
 app.post('/login', function (req, res, next) {
   User.findOne({
     where: req.body
@@ -39,7 +45,6 @@ app.post('/login', function (req, res, next) {
     if (!user) {
       res.sendStatus(401);
     } else {
-      console.log(user);
       req.session.userId = user.id;
       res.status(201);
       res.send(user);

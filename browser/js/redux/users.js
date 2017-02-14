@@ -7,6 +7,7 @@ const CREATE     = 'CREATE_USER';
 export const REMOVE = 'REMOVE_USER';
 const UPDATE     = 'UPDATE_USER';
 const SET_CURRENT_USER = 'SET_CURRENT_USER';
+const VOID_CURRENT_USER = 'VOID_CURRENT_USER'
 
 /* ------------   ACTION CREATORS     ------------------ */
 
@@ -15,6 +16,7 @@ const create = user  => ({ type: CREATE, user });
 const remove = id    => ({ type: REMOVE, id });
 const update = user  => ({ type: UPDATE, user });
 const setCurrentUser = currentUser => ({ type: SET_CURRENT_USER, currentUser});
+export const voidCurrentUser = () => ({ type: VOID_CURRENT_USER});
 
 /* ------------       REDUCER     ------------------ */
 
@@ -37,8 +39,11 @@ export default function reducer (users = [], action) {
       ));
 
     case SET_CURRENT_USER:
-      console.log('TAGGGGG', action.currentUser);
       users.currentUser = action.currentUser;
+      return users;
+
+    case VOID_CURRENT_USER:
+      users.currentUser = null;
       return users;
 
     default:
@@ -63,7 +68,10 @@ export const removeUser = id => dispatch => {
 
 export const addUser = user => dispatch => {
   axios.post('/api/users', user)
-       .then(res => dispatch(create(res.data)))
+       .then(res => {
+         dispatch(create(res.data));
+         dispatch(setCurrentUser(res.data));
+        })
        .catch(err => console.error(`Creating user: ${user} unsuccesful`, err));
 };
 
@@ -76,7 +84,6 @@ export const updateUser = (id, user) => dispatch => {
 export const findUser = (user) => dispatch => {
   axios.post('/login', user)
     .then(function (results) {
-      console.log("YYYYAAAYYY", results);
       dispatch(setCurrentUser(results.data));
     });
 };

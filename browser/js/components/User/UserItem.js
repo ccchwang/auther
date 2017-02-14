@@ -15,6 +15,10 @@ class UserItem extends React.Component {
 
   render () {
     const { user } = this.props;
+    const isAdmin = this.props.isAdmin;
+
+console.log(isAdmin)
+
     return (
       <div className="list-group-item min-content user-item">
         <div className="media">
@@ -37,6 +41,7 @@ class UserItem extends React.Component {
           </Link>
           <div className="media-right media-middle">
             <button
+                disabled={!isAdmin}
                 className="btn btn-default"
                 onClick={this.removeUserCallback}>
               <span className="glyphicon glyphicon-remove" />
