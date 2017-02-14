@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { browserHistory } from 'react-router';
 import axios from 'axios';
+import { findUser } from '../redux/users';
 /* -----------------    COMPONENT     ------------------ */
 
 class Login extends React.Component {
@@ -64,17 +65,23 @@ class Login extends React.Component {
       email: event.target.email.value,
       password: event.target.password.value
     }
+    this.props.logIn(user);
     console.log(user);
-    axios.post('/login', user)
-    .then(function (results) {
-      console.log("YYYYAAAYYY", results);
-    });
   }
 }
 
 /* -----------------    CONTAINER     ------------------ */
+const mapState = (state) => {
+  console.log("State", state);
+  return { message: 'Log in' };
+};
+const mapDispatch = (dispatch) => {
+  return {
+    logIn: function (user) {
+      dispatch(findUser(user));
+    }
+  };
+};
 
-const mapState = () => ({ message: 'Log in' });
-const mapDispatch = null;
 
 export default connect(mapState, mapDispatch)(Login);

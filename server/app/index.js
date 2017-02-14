@@ -39,8 +39,10 @@ app.post('/login', function (req, res, next) {
     if (!user) {
       res.sendStatus(401);
     } else {
+      console.log(user);
       req.session.userId = user.id;
-      res.sendStatus(204);
+      res.status(201);
+      res.send(user);
     }
   })
   .catch(next);

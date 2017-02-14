@@ -6,7 +6,7 @@ const INITIALIZE = 'INITIALIZE_USERS';
 const CREATE     = 'CREATE_USER';
 export const REMOVE = 'REMOVE_USER';
 const UPDATE     = 'UPDATE_USER';
-
+const SET_CURRENT_USER = 'SET_CURRENT_USER';
 
 /* ------------   ACTION CREATORS     ------------------ */
 
@@ -14,11 +14,12 @@ const init  = users => ({ type: INITIALIZE, users });
 const create = user  => ({ type: CREATE, user });
 const remove = id    => ({ type: REMOVE, id });
 const update = user  => ({ type: UPDATE, user });
-
+const setCurrentUser = currentUser => ({ type: SET_CURRENT_USER, currentUser});
 
 /* ------------       REDUCER     ------------------ */
 
 export default function reducer (users = [], action) {
+  console.log("INSIDE REDUCER");
   switch (action.type) {
 
     case INITIALIZE:
@@ -34,6 +35,11 @@ export default function reducer (users = [], action) {
       return users.map(user => (
         action.user.id === user.id ? action.user : user
       ));
+
+    case SET_CURRENT_USER:
+      console.log('TAGGGGG', action.currentUser);
+      users.currentUser = action.currentUser;
+      return users;
 
     default:
       return users;
@@ -65,4 +71,12 @@ export const updateUser = (id, user) => dispatch => {
   axios.put(`/api/users/${id}`, user)
        .then(res => dispatch(update(res.data)))
        .catch(err => console.error(`Updating user: ${user} unsuccesful`, err));
+};
+
+export const findUser = (user) => dispatch => {
+  axios.post('/login', user)
+    .then(function (results) {
+      console.log("YYYYAAAYYY", results);
+      dispatch(setCurrentUser(results.data));
+    });
 };
