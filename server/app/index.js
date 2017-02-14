@@ -2,8 +2,17 @@
 
 var app = require('express')();
 var path = require('path');
+var expressSession = require('express-session');
 
 // "Enhancing" middleware (does not send response, server-side effects only)
+
+app.use(expressSession({
+  // this mandatory configuration ensures that session IDs are not predictable
+  secret: 'tongiscool', // or whatever you like
+  // these options are recommended and reduce session concurrency issues
+  resave: false,
+  saveUnitialized: false
+}));
 
 app.use(require('./logging.middleware'));
 
