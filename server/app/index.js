@@ -5,31 +5,39 @@ var path = require('path');
 var expressSession = require('express-session');
 var User = require('../api/users/user.model');
 var passport = require('passport');
-
-// "Enhancing" middleware (does not send response, server-side effects only)
+var LocalStrategy = require('passport-local').Strategy;
 
 app.use(expressSession({
-  // this mandatory configuration ensures that session IDs are not predictable
-  secret: 'tongiscool', // or whatever you like
-  // these options are recommended and reduce session concurrency issues
+  secret: 'tongiscool',
   resave: false,
   saveUnitialized: false
 }));
 
-// app.use('/api', function (req, res, next) {
-//   if (!req.session.counter) req.session.counter = 0;
-//   console.log('counter', ++req.session.counter);
-//   next();
-// });
-
 app.use(passport.initialize());
 app.use(passport.session());
+
+passport.use(new LocalStrategy({
+    usernameField: 'email'
+  },
+  function(email, password, done) {
+    User.findOne({
+      where: {
+        email: email
+      }
+    })
+    .then (function (user) {
+      // console.log(user);
+      done(null, user);
+    });
+  }
+));
+
 
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 passport.use(
   new GoogleStrategy({
-    clientID: 'CLIENTKEYHERE',
-    clientSecret: 'CLIENTSECRETHERE',
+    clientID: 'clientID',
+    clientSecret: 'clientSecret',
     callbackURL: '/auth/google/callback'
   },
   // Google will send back the token and profile
@@ -48,8 +56,20 @@ passport.use(
   })
 );
 
+passport.serializeUser(function (user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function (id, done) {
+  User.findById(id)
+  .then(function (user) {
+    done(null, user);
+  })
+  .catch(done);
+});
+
 app.use(function (req, res, next) {
-  console.log('session', req.session);
+  console.log('session', req.session, req.user);
   next();
 });
 
@@ -57,29 +77,17 @@ app.use(require('./logging.middleware'));
 
 app.use(require('./body-parsing.middleware'));
 
-app.get('/logout', function (req, res, next) {
-  req.session.destroy();
-  res.redirect('/')
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
 });
 
-
-app.post('/login', function (req, res, next) {
-  User.findOne({
-    where: req.body
+app.post('/login',
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login'
   })
-  .then(function (user) {
-    if (!user) {
-      res.sendStatus(401);
-    } else {
-      req.session.userId = user.id;
-      res.status(201);
-      res.send(user);
-    }
-  })
-  .catch(next);
-});
-
-// "Responding" middleware (may send a response back to client)
+);
 
 app.use('/api', require('../api/api.router'));
 
@@ -88,18 +96,10 @@ app.get('/auth/google', passport.authenticate('google', { scope: 'email' }));
 // handle the callback after Google has authenticated the user
 app.get('/auth/google/callback',
   passport.authenticate('google', {
-    successRedirect: '/', // or wherever
-    failureRedirect: '/' // or wherever
+    successRedirect: '/',
+    failureRedirect: '/'
   })
 );
-
-passport.serializeUser(function (user, done) {
-  // __________
-});
-
-passport.deserializeUser(function (id, done) {
-  // __________
-});
 
 var validFrontendRoutes = ['/', '/stories', '/users', '/stories/:id', '/users/:id', '/signup', '/login'];
 var indexPath = path.join(__dirname, '..', '..', 'browser', 'index.html');

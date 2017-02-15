@@ -66,13 +66,11 @@ class Login extends React.Component {
       password: event.target.password.value
     }
     this.props.logIn(user);
-    console.log(user);
   }
 }
 
 /* -----------------    CONTAINER     ------------------ */
 const mapState = (state) => {
-  console.log("State", state);
   return { message: 'Log in' };
 };
 const mapDispatch = (dispatch) => {

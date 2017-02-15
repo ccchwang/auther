@@ -21,7 +21,6 @@ export const voidCurrentUser = () => ({ type: VOID_CURRENT_USER});
 /* ------------       REDUCER     ------------------ */
 
 export default function reducer (users = [], action) {
-  console.log("INSIDE REDUCER");
   switch (action.type) {
 
     case INITIALIZE:
